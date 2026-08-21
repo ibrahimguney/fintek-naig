@@ -1,0 +1,18 @@
+variable,type,description,source
+ISO2,string,ISO 3166-1 alpha-2 jurisdiction code,BIS / harmonized
+country_name,string,Jurisdiction name,BIS
+project_score_overall,numeric,"Overall CBDC stage: 0 none; 1 research; 2 pilot; 3 live",BIS
+project_score_retail,numeric,Retail CBDC project stage,BIS
+project_score_wholesale,numeric,Wholesale CBDC project stage,BIS
+advanced_cbdc,binary,"1 if overall CBDC stage is pilot/live (>=2), otherwise 0",Derived
+search_interest_normalized,numeric,Normalized CBDC search interest measure,BIS
+central_bankers_speech_stance_index_normalized,numeric,Normalized central banker speech stance index,BIS
+incomegroupwb24,string,World Bank income group,World Bank Global Findex
+regionwb24_hi,string,World Bank regional grouping,World Bank Global Findex
+pop_adult,numeric,Adult population,World Bank Global Findex
+log_adult_population,numeric,Natural log of adult population,Derived
+account_ownership_2021,numeric,Share of adults with an account in 2021,World Bank Global Findex
+digital_payment_2021,numeric,Share of adults making or receiving digital payments in 2021,World Bank Global Findex
+online_bill_payment_2021,numeric,Share of adults paying utility bills using internet/mobile in 2021,World Bank Global Findex
+digital_merchant_payment_2021,numeric,Share of adults making digital merchant payments in 2021,World Bank Global Findex
+borrowed_any_2021,numeric,Share of adults who borrowed any money in 2021,World Bank Global Findex
