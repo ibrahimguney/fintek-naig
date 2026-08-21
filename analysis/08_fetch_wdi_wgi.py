@@ -22,15 +22,6 @@ WDI = {
     "BX.KLT.DINV.WD.GD.ZS": "fdi_net_inflows_2021",
 }
 
-WGI = {
-    "VA.EST": "wgi_voice_accountability_2021",
-    "PV.EST": "wgi_political_stability_2021",
-    "GE.EST": "wgi_government_effectiveness_2021",
-    "RQ.EST": "wgi_regulatory_quality_2021",
-    "RL.EST": "wgi_rule_of_law_2021",
-    "CC.EST": "wgi_control_corruption_2021",
-}
-
 WGI_SHEETS = {
     "va": "wgi_voice_accountability_2021",
     "pv": "wgi_political_stability_2021",
@@ -104,20 +95,6 @@ def fetch_wdi() -> pd.DataFrame:
     return base
 
 
-def fetch_wgi_api() -> pd.DataFrame:
-    frames = [_indicator_frame(code, name, source=3) for code, name in WGI.items()]
-    if any(frame.empty for frame in frames):
-        raise RuntimeError("One or more WGI API series returned no rows")
-    base = frames[0]
-    for frame in frames[1:]:
-        base = base.merge(
-            frame.drop(columns=[c for c in ["ISO3", "country_wb"] if c in frame.columns]),
-            on="ISO2",
-            how="outer",
-        )
-    return base.sort_values("ISO2")
-
-
 def _normalise_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df.columns = (
@@ -137,7 +114,8 @@ def fetch_wgi_excel() -> pd.DataFrame:
     xlsx_path = RAW / "wgidataset_with_sourcedata-2025.xlsx"
     xlsx_path.write_bytes(response.content)
 
-    frames = []
+    metric_frames = []
+    country_names = None
     for sheet, out_name in WGI_SHEETS.items():
         d = pd.read_excel(io.BytesIO(response.content), sheet_name=sheet)
         d = _normalise_columns(d)
@@ -151,10 +129,14 @@ def fetch_wgi_excel() -> pd.DataFrame:
             "economy_name": "country_wb",
             "governance_estimate_approx_2_5_to_2_5": out_name,
         })
-        keep = [c for c in ["ISO3", "country_wb", out_name] if c in d.columns]
-        frames.append(d[keep].drop_duplicates(subset=["ISO3"], keep="last"))
+        d[out_name] = pd.to_numeric(d[out_name], errors="coerce")
+        if country_names is None and "country_wb" in d.columns:
+            country_names = d[["ISO3", "country_wb"]].drop_duplicates("ISO3", keep="last")
+        metric_frames.append(d[["ISO3", out_name]].drop_duplicates("ISO3", keep="last"))
 
-    wgi = reduce(lambda left, right: left.merge(right, on="ISO3", how="outer"), frames)
+    wgi = reduce(lambda left, right: left.merge(right, on="ISO3", how="outer"), metric_frames)
+    if country_names is not None:
+        wgi = country_names.merge(wgi, on="ISO3", how="right")
 
     countries = requests.get(
         "https://api.worldbank.org/v2/country",
@@ -164,30 +146,35 @@ def fetch_wgi_excel() -> pd.DataFrame:
     countries.raise_for_status()
     country_rows = countries.json()[1]
     crosswalk = pd.DataFrame([
-        {"ISO2": x.get("iso2Code"), "ISO3": x.get("id"), "region_id": (x.get("region") or {}).get("id")}
+        {
+            "ISO2": x.get("iso2Code"),
+            "ISO3": x.get("id"),
+            "region_id": (x.get("region") or {}).get("id"),
+        }
         for x in country_rows
     ])
-    crosswalk = crosswalk[crosswalk["region_id"].astype(str).str.len() > 0]
+    crosswalk = crosswalk[
+        crosswalk["ISO2"].astype(str).str.len().eq(2)
+        & crosswalk["ISO3"].astype(str).str.len().eq(3)
+        & crosswalk["region_id"].astype(str).str.len().gt(0)
+    ]
     crosswalk = crosswalk.drop(columns="region_id").drop_duplicates("ISO3")
     wgi = crosswalk.merge(wgi, on="ISO3", how="inner")
     return wgi.sort_values("ISO2")
 
 
 def fetch_wgi() -> pd.DataFrame:
-    try:
-        wgi = fetch_wgi_api()
-        method = "World Bank Indicators API, source=3"
-    except Exception as api_error:
-        print(f"WGI API fallback activated: {api_error}")
-        wgi = fetch_wgi_excel()
-        method = "WGI 2025 revision Excel fallback"
+    # WGI 2025 Revision is distributed by the World Bank as an official Excel
+    # workbook. We use that revision directly because the generic Indicators API
+    # can lag or expose older WGI source mappings.
+    wgi = fetch_wgi_excel()
     wgi.to_csv(RAW / "wgi_2021.csv", index=False)
-    print(f"WGI source: {method}")
+    print("WGI source: official WGI 2025 revision Excel")
     return wgi
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fetch/cached 2021 WDI and WGI controls.")
+    parser = argparse.ArgumentParser(description="Fetch/cache 2021 WDI and WGI controls.")
     parser.add_argument("--force", action="store_true", help="Refresh cached snapshots from World Bank.")
     args = parser.parse_args()
 
