@@ -18,5 +18,6 @@ Thumbs.db
 
 # Optional full external downloads (large/re-downloadable)
 data/external/
+data/raw/wgidataset_with_sourcedata-2025.xlsx
 
 # Keep reproducible research outputs and compact research data in Git
