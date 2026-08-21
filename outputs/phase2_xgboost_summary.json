@@ -1,0 +1,54 @@
+{
+  "n": 112,
+  "positive_class_n": 37,
+  "negative_class_n": 75,
+  "features": [
+    "account_ownership_2021",
+    "digital_payment_2021",
+    "online_bill_payment_2021",
+    "log_adult_population",
+    "log_gdp_per_capita_ppp_2021",
+    "internet_users_2021",
+    "domestic_credit_private_2021",
+    "inflation_2021",
+    "urban_population_2021",
+    "fdi_net_inflows_2021",
+    "wgi_governance_index_2021"
+  ],
+  "cv": {
+    "roc_auc": {
+      "mean": 0.7103968253968254,
+      "std": 0.09045321345668696
+    },
+    "accuracy": {
+      "mean": 0.7205533596837944,
+      "std": 0.07150920653300469
+    },
+    "f1": {
+      "mean": 0.5217879288467523,
+      "std": 0.1362660630277086
+    }
+  },
+  "top_shap_features": [
+    {
+      "feature": "log_adult_population",
+      "mean_abs_shap": 0.8816028237342834
+    },
+    {
+      "feature": "internet_users_2021",
+      "mean_abs_shap": 0.6420565247535706
+    },
+    {
+      "feature": "account_ownership_2021",
+      "mean_abs_shap": 0.508560061454773
+    },
+    {
+      "feature": "domestic_credit_private_2021",
+      "mean_abs_shap": 0.30600860714912415
+    },
+    {
+      "feature": "inflation_2021",
+      "mean_abs_shap": 0.2819519340991974
+    }
+  ]
+}

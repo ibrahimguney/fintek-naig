@@ -1,0 +1,12 @@
+feature,mean_abs_shap,xgboost_gain_importance
+log_adult_population,0.8816028,0.13176098
+internet_users_2021,0.6420565,0.12131311
+account_ownership_2021,0.50856006,0.122017674
+domestic_credit_private_2021,0.3060086,0.057831284
+inflation_2021,0.28195193,0.06057096
+urban_population_2021,0.22157444,0.087036245
+fdi_net_inflows_2021,0.2155831,0.046159595
+log_gdp_per_capita_ppp_2021,0.17609166,0.08642443
+wgi_governance_index_2021,0.16465588,0.07825048
+digital_payment_2021,0.15050772,0.15339991
+online_bill_payment_2021,0.1297639,0.05523524

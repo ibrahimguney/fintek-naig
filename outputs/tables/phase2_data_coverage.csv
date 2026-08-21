@@ -1,0 +1,10 @@
+variable,non_missing_n,missing_n,coverage_pct
+account_ownership_2021,112,0,100.0
+online_bill_payment_2021,112,0,100.0
+log_gdp_per_capita_ppp_2021,109,3,97.32142857142857
+internet_users_2021,107,5,95.53571428571429
+domestic_credit_private_2021,99,13,88.39285714285714
+inflation_2021,108,4,96.42857142857143
+urban_population_2021,111,1,99.10714285714286
+fdi_net_inflows_2021,110,2,98.21428571428571
+wgi_governance_index_2021,111,1,99.10714285714286
